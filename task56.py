@@ -82,14 +82,14 @@ def check_user_del_request(path1, what_to_del):
     a = None
     for i in range(len(lines_to_del)):
         print(f"{i}. {lines_to_del[i]}", end="")
-    print(f"\n{len(lines_to_del)}. Не надо ничего удалять.")
+    print(f"{len(lines_to_del)}. Не надо ничего удалять.")
     a = int(input())
 
     if a == len(lines_to_del):
         return
     elif 0 <= a < len(lines_to_del):
         print(f"Вы уверены, что хотите удалить строку ниже?\n"
-              f"{lines_to_del[a]}\n"
+              f"{lines_to_del[a]}"
               f"Если уверены, нажмите Y.")
         if input("").upper() == 'Y':
             del_line_from_file(os.getcwd(), lines_to_del[a])
