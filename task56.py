@@ -15,39 +15,90 @@
 import os
 
 
+# генерация сообщеняи об ошибке -- использую его в нескольких функциях, не хочу хардкодить в каждой
+def error_message():
+    return "Извините, такой записи нет\n"
+
+
+# запись в файл
 def write_to_file(path1):
     tmp_line = input("Введите ФИО и телефон: ")
     with open('phones.txt', "a") as file1:
         file1.write(tmp_line + "\n")
 
 
+# поиск по файлу -- переделала, чтобы возвращал списки
 def search_file(path1, search_input):
     with open('phones.txt', "r") as file1:
         lst_1 = file1.readlines()
         flag1 = False
-        result = "\n"
+        result = []
         for line in lst_1:
             if search_input in line:
-                result = result + line
+                result.append(line)
                 flag1 = True
         if not flag1:
-            result = "Извините, такой записи нет\n"
+            result.append(error_message())
     return result
 
 
+# вывод всего файла
 def show_all(path1):
     with open('phones.txt', "r") as file1:
         return file1.read()
 
 
-def del_line(path1, what_to_del):
-    search_file(path1, what_to_del)
-    pass
+# удаление по точной строке
+def del_line_from_file(path1, str_to_del):
+    tmp_list = []
+
+    # выгружаю файл в список
+    with open('phones.txt', "r") as file1:
+        tmp_list = file1.readlines()
+        # print(tmp_list)
+
+    # нахожу индекс нужной строки в списке и удаляю ее из списка
+    tmp_index = tmp_list.index(str_to_del)
+    tmp_list.pop(tmp_index)
+    # print(tmp_list)
+
+    # записываю новый список в файл
+    with open('phones.txt', "w") as file1:
+        file1.writelines(tmp_list)
+        print("Строка успешно удалена\n")
 
 
-def edit_line(path1, what_to_edit):
-    search_file(path1, what_to_edit)
-    pass
+# выбор конкретной строки, которую пользователь хочет удалить, обработка действий пользователя
+def check_user_del_request(path1, what_to_del):
+    # ищем строки с введенными пользователем символами
+    lines_to_del = search_file(path1, what_to_del)
+    # обрабатываем случай, когда запрошенной информации в файле нет (сообщение об ошибке, возврат в меню)
+    if lines_to_del[0] == error_message():
+        print(lines_to_del[0])
+        return
+
+    # просим выбрать строку для удаления и подтвердить удаление
+    print("Выберите номер строки, которую хотите удалить:")
+    a = None
+    for i in range(len(lines_to_del)):
+        print(f"{i}. {lines_to_del[i]}", end="")
+    print(f"\n{len(lines_to_del)}. Не надо ничего удалять.")
+    a = int(input())
+
+    if a == len(lines_to_del):
+        return
+    elif 0 <= a < len(lines_to_del):
+        print(f"Вы уверены, что хотите удалить строку ниже?\n"
+              f"{lines_to_del[a]}\n"
+              f"Если уверены, нажмите Y.")
+        if input("").upper() == 'Y':
+            del_line_from_file(os.getcwd(), lines_to_del[a])
+        return
+
+
+# def edit_line(path1, what_to_edit):
+#     search_file(path1, what_to_edit)
+#     pass
 
 
 
@@ -67,13 +118,14 @@ def get_user_intention():
         elif a == '2':
             to_search = input("Что ищем? ")
             result = search_file(os.getcwd(), to_search)
-            print(result)
+            print(*result)
         elif a == '3':
             result = show_all(os.getcwd())
             print(result)
+            print()
         elif a == '4':
             to_search = input("Что вы хотите удалить? ")
-            result = search_file(os.getcwd(), to_search)
+            check_user_del_request(os.getcwd(), to_search)
         elif a == '5':
             result = show_all(os.getcwd())
             print(result)
