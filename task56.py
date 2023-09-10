@@ -15,7 +15,7 @@
 import os
 
 
-# генерация сообщеняи об ошибке -- использую его в нескольких функциях, не хочу хардкодить в каждой
+# генерация сообщения об ошибке -- использую его в нескольких функциях, не хочу хардкодить в каждой с опечатками
 def error_message():
     return "Извините, такой записи нет\n"
 
@@ -96,6 +96,7 @@ def check_user_del_request(path1, what_to_del):
         return
 
 
+# правка
 # def edit_line(path1, what_to_edit):
 #     search_file(path1, what_to_edit)
 #     pass
