@@ -68,41 +68,64 @@ def del_line_from_file(path1, str_to_del):
         print("Строка успешно удалена\n")
 
 
-# выбор конкретной строки, которую пользователь хочет удалить, обработка действий пользователя
-def check_user_del_request(path1, what_to_del):
+# правка по точной строке
+def edit_line(path1, str_to_edit):
+    tmp_list = []
+
+    #запрашиваю, на что меняем
+    new_str = input("Введите данные, на которые нужно поменять текущие (строку целиком: ФИО и номер телефона): ")
+
+    # выгружаю файл в список
+    with open('phones.txt', "r") as file1:
+        tmp_list = file1.readlines()
+        # print(tmp_list)
+
+    # нахожу индекс нужной строки в списке и удаляю ее из списка
+    tmp_index = tmp_list.index(str_to_edit)
+    tmp_list[tmp_index] = new_str
+    # print(tmp_list)
+
+    # записываю новый список в файл
+    with open('phones.txt', "w") as file1:
+        file1.writelines(tmp_list)
+        print("Строка успешно изменена\n")
+
+
+# выбор конкретной строки, которую пользователь хочет удалить или изменить, и вызов соответствующей процедуры
+def check_user_request(path1, what_to_find, what_to_do):
     # ищем строки с введенными пользователем символами
-    lines_to_del = search_file(path1, what_to_del)
+    lines_to_edit = search_file(path1, what_to_find)
     # обрабатываем случай, когда запрошенной информации в файле нет (сообщение об ошибке, возврат в меню)
-    if lines_to_del[0] == error_message():
-        print(lines_to_del[0])
+    if lines_to_edit[0] == error_message():
+        print(lines_to_edit[0])
         return
 
-    # просим выбрать строку для удаления и подтвердить удаление
-    print("Выберите номер строки, которую хотите удалить:")
+    # просим выбрать одну конкретную строку и подтвердить удаление/изменение
+    print(f"Выберите номер строки, которую хотите {what_to_do}:")
     a = None
-    for i in range(len(lines_to_del)):
-        print(f"{i}. {lines_to_del[i]}", end="")
-    print(f"{len(lines_to_del)}. Не надо ничего удалять.")
+    for i in range(len(lines_to_edit)):
+        print(f"{i}. {lines_to_edit[i]}", end="")
+    print(f"{len(lines_to_edit)}. Не хочу ничего {what_to_do}.")
     a = int(input())
 
-    if a == len(lines_to_del):
+    if a == len(lines_to_edit):
         return
-    elif 0 <= a < len(lines_to_del):
-        print(f"Вы уверены, что хотите удалить строку ниже?\n"
-              f"{lines_to_del[a]}"
+    elif 0 <= a < len(lines_to_edit):
+        print(f"Вы уверены, что хотите {what_to_do} строку ниже?\n"
+              f"{lines_to_edit[a]}"
               f"Если уверены, нажмите Y.")
+        # вызываем, собственно, удаление или правку
         if input("").upper() == 'Y':
-            del_line_from_file(os.getcwd(), lines_to_del[a])
+            if what_to_do == "удалить":
+                # интуитивно хочется для выбора между удалением и правкой завести отдельную переменную int, с кодами
+                # каждого действия, но по сути она будет просто дублировать эти строки, так что пользуюсь строками
+                del_line_from_file(os.getcwd(), lines_to_edit[a])
+            elif what_to_do == "изменить":
+                edit_line(os.getcwd(), lines_to_edit[a])
         return
 
 
-# правка
-# def edit_line(path1, what_to_edit):
-#     search_file(path1, what_to_edit)
-#     pass
-
-
-
+# меню пользоателя
 def get_user_intention():
     txt_zapros = "Введите номер команды, которую хотите выполнить.\n" \
                  "1. Записать новые данные в файл\n" \
@@ -126,10 +149,10 @@ def get_user_intention():
             print()
         elif a == '4':
             to_search = input("Что вы хотите удалить? ")
-            check_user_del_request(os.getcwd(), to_search)
+            check_user_request(os.getcwd(), to_search, "удалить")
         elif a == '5':
-            result = show_all(os.getcwd())
-            print(result)
+            to_search = input("Что вы хотите изменить? ")
+            check_user_request(os.getcwd(), to_search, "изменить")
 
 
 get_user_intention()
